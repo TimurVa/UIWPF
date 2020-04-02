@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,12 +29,16 @@ namespace TemporaryWPF.RectangleControls
         public bool CurrentlyMoving = false;
         public Line line;
         public Point diffPosition;
+        public Ellipse ellipse;
+        public Rectangle rectangle;
+        public ObservableCollection<LineControl> _lineControl;
 
 
         public MovingControl()
         {
             InitializeComponent();
         }
+
 
         public MovingControl(BaseRectangleModel baseRectangleModel)
         {
@@ -44,8 +49,36 @@ namespace TemporaryWPF.RectangleControls
             this.Width = (double)BaseRectangleModel.model.Width;
             Canvas.SetLeft(this, (double)BaseRectangleModel.model.Leftpos);
             Canvas.SetTop(this, (double)BaseRectangleModel.model.Toppos);
+
+
+
+            _lineControl = new ObservableCollection<LineControl>();
+            _lineControl.CollectionChanged += _lineControl_CollectionChanged;
         }
-        
+       
+
+        private void _lineControl_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    {
+                        this.forAdd.Children.Add((LineControl)e.NewItems[0]);
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    {
+                        this.forAdd.Children.Remove(((LineControl)e.NewItems[0]));
+                    }
+                    break;
+            }
+        }
+
+        //public enum RecBorder
+        //{
+        //    L, R, T, B, BR, BL, TR, TL, None
+        //}
+
         public void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Selected = e.OriginalSource as UIElement;
@@ -61,9 +94,9 @@ namespace TemporaryWPF.RectangleControls
             
         public void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-                this.BaseRectangleModel.Send();
-
-                OveralldbClass.db.SaveChanges();
+            this.BaseRectangleModel.Send();
+         
+            OveralldbClass.db.SaveChanges();
 
 
             if (captureMouse && Selected != null)
@@ -97,146 +130,137 @@ namespace TemporaryWPF.RectangleControls
                 PrevPos = point;
             }
         }
-        
+        //delete
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            clear.Children.Remove(this.BaseRectangleModel.shape);
-            OveralldbClass.db.Remove(this.BaseRectangleModel.model);
-            OveralldbClass.db.SaveChanges();
+                forAdd.Children.Remove(line);
+                forAdd.Children.Remove(ellipse);
+                forAdd.Children.Remove(rectangle);
+                clear.Children.Remove(this.BaseRectangleModel.shape);
+                OveralldbClass.db.Remove(this.BaseRectangleModel.model);
+                OveralldbClass.db.SaveChanges();
         }
-
+        //add
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
-            Rectangle rectangle = new Rectangle()
-            {
-                Width = 10,
-                Height = 10,
-                Fill = Brushes.White,
-                Stroke = Brushes.Black
-            };
-
-            Ellipse ellipse = new Ellipse()
-            {
-                Width = 6,
-                Height = 6,
-                Fill = Brushes.Black
-            };
-
-            line = new Line()
-            {
-                X1 = diffPosition.X,
-                Y1 = diffPosition.Y,
-                X2 = diffPosition.X + 50,
-                Y2 = diffPosition.Y,
-                Stroke = Brushes.Black,
-                StrokeThickness = 4,
-            };
-
-
-            Canvas.SetLeft(rectangle, 2);
-            Canvas.SetTop(rectangle, 2);
-            Canvas.SetLeft(ellipse, 2);
-            Canvas.SetTop(ellipse, 2);
-            Canvas.SetLeft(line, 2);
-            Canvas.SetTop(line, 2);
-            forAdd.Children.Add(rectangle);
-            forAdd.Children.Add(ellipse);
-            forAdd.Children.Add(line);
+            _lineControl.Add(new LineControl(BaseRectangleModel));
         }
 
-        private void ForAdd_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            Selected = e.OriginalSource as UIElement;
+        //private void ForAdd_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    Selected = e.OriginalSource as UIElement;
+
+        //    if (e.OriginalSource == ellipse)
+        //    {
+        //        line = new Line()
+        //        {
+        //            X1 = Canvas.GetLeft(Selected),
+        //            Y1 = Canvas.GetTop(Selected),
+        //            Stroke = Brushes.Black,
+        //            StrokeThickness = 2
+        //        };
+        //        line.CaptureMouse();
+        //        diffPosition = e.GetPosition(line);
+        //        forAdd.Children.Add(line);
+        //    }
+
+        //    if (Selected != null)
+        //    {
+        //        captureMouse = Selected.CaptureMouse();
+        //        diffPosition = e.GetPosition(Selected);
+        //        var s = Canvas.GetLeft((UIElement)e.OriginalSource);
+        //        var o = Canvas.GetTop(Selected);
+        //    }
+        //    ///for line
+        //    ///
+        //    /// 
+        //    ///
+        //}
+
+        //private void ForAdd_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        //{
+        //    if (captureMouse)
+        //    {
+        //        Selected.ReleaseMouseCapture();
+        //    }
+        //    /// for line
+
+        //    /// 
+        //    Selected = null;
+        //}
+
+        //private void ForAdd_MouseMove(object sender, MouseEventArgs e)
+        //{
+        //    if (Selected != null)
+        //    {
+        //        if (e.OriginalSource != line && e.OriginalSource != ellipse)
+        //        {
+        //            if (Canvas.GetLeft((UIElement)e.OriginalSource) <= this.Width &&
+        //                Canvas.GetTop((UIElement)e.OriginalSource) <= this.Height &&
+        //                Canvas.GetTop((UIElement)e.OriginalSource) >= 0 &&
+        //                Canvas.GetLeft((UIElement)e.OriginalSource) >= 0)
+        //            {
+        //                Canvas.SetLeft(Selected, e.GetPosition(this.forAdd).X - diffPosition.X);
+        //                Canvas.SetTop(Selected, e.GetPosition(this.forAdd).Y - diffPosition.Y);
+
+        //                Canvas.SetLeft(ellipse, e.GetPosition(this.forAdd).X - diffPosition.X + (rectangle.Width / 2));
+        //                Canvas.SetTop(ellipse, e.GetPosition(this.forAdd).Y - diffPosition.Y + (rectangle.Height / 4));
+        //                if (line != null)
+        //                {
+
+        //                    Canvas.SetLeft(line, e.GetPosition(this.forAdd).X - diffPosition.X);
+        //                    Canvas.SetTop(line, e.GetPosition(this.forAdd).Y - diffPosition.Y);
+        //                }
+        //            }
+
+        //            else if (Canvas.GetLeft((UIElement)e.OriginalSource) >= this.Width - 11)
+        //            {
+        //                Canvas.SetLeft((UIElement)e.OriginalSource, this.Width - rectangle.Height);
+        //                Canvas.SetLeft(ellipse, this.Width - rectangle.Height);
+        //                Selected.ReleaseMouseCapture();
+        //                captureMouse = false;
+        //                Selected = null;
+        //            }
+
+        //            else if (Canvas.GetTop((UIElement)e.OriginalSource) >= this.Height - 11)
+        //            {
+        //                Canvas.SetTop((UIElement)e.OriginalSource, this.Width - rectangle.Height);
+        //                Canvas.SetTop(ellipse, this.Width - rectangle.Height);
+        //                Selected.ReleaseMouseCapture();
+        //                captureMouse = false;
+        //                Selected = null;
+        //            }
+
+        //            else if (Canvas.GetTop((UIElement)e.OriginalSource) <= 0)
+        //            {
+        //                Canvas.SetTop((UIElement)e.OriginalSource, this.Width - 79);
+        //                Canvas.SetTop(ellipse, this.Width - rectangle.Height);
+        //                Selected.ReleaseMouseCapture();
+        //                captureMouse = false;
+        //                Selected = null;
+        //            }
+
+        //            else if (Canvas.GetLeft((UIElement)e.OriginalSource) <= 0)
+        //            {
+        //                Canvas.SetLeft((UIElement)e.OriginalSource, this.Width - 79);
+        //                Canvas.SetLeft(ellipse, this.Width - rectangle.Height);
+        //                Selected.ReleaseMouseCapture();
+        //                captureMouse = false;
+        //                Selected = null;
+        //            }
+        //        }
+        //        else if (e.OriginalSource == ellipse)
+        //        {
+        //            line.X2 = Mouse.GetPosition(this.forAdd).X;
+        //            line.Y2 = Mouse.GetPosition(this.forAdd).Y;
+        //            //   Canvas.SetZIndex(line, 10000);
+        //        }
+        //    }
+        //    /for line probably
 
 
-            if (Selected != null)
-            {
-                captureMouse = Selected.CaptureMouse();
-                diffPosition = e.GetPosition(Selected);
-                var s = Canvas.GetLeft((UIElement)e.OriginalSource);
-                var o = Canvas.GetTop(Selected);
-            }
-
-            ///for line
-            ///
-            /// 
-            ///
-        }
-
-        private void ForAdd_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (captureMouse)
-            {
-                Selected.ReleaseMouseCapture();
-            }
-
-            /// for line
-            
-            
-            /// 
-            Selected = null;
-        }
-
-        private void ForAdd_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (Selected != null)
-            {
-                if (e.OriginalSource != line)
-                {
-                    if (Canvas.GetLeft((UIElement)e.OriginalSource) <= this.Width - 11 &&
-                        Canvas.GetTop((UIElement)e.OriginalSource) <= this.Height - 11 &&
-                        Canvas.GetTop((UIElement)e.OriginalSource) >= 0 &&
-                        Canvas.GetLeft((UIElement)e.OriginalSource) >= 0)
-                    {
-                        Canvas.SetLeft(Selected, e.GetPosition(this.forAdd).X - diffPosition.X);
-                        Canvas.SetTop(Selected, e.GetPosition(this.forAdd).Y - diffPosition.Y);
-                    }
-
-                    else if (Canvas.GetLeft((UIElement)e.OriginalSource) >= this.Width - 11)
-                    {
-                        Canvas.SetLeft((UIElement)e.OriginalSource, this.Width - 11);
-                        Selected.ReleaseMouseCapture();
-                        captureMouse = false;
-                        Selected = null;
-                    }
-
-                    else if (Canvas.GetTop((UIElement)e.OriginalSource) >= this.Height - 11)
-                    {
-                        Canvas.SetTop((UIElement)e.OriginalSource, this.Width - 11);
-                        Selected.ReleaseMouseCapture();
-                        captureMouse = false;
-                        Selected = null;
-                    }
-
-                    else if (Canvas.GetTop((UIElement)e.OriginalSource) <= 0)
-                    {
-                        Canvas.SetTop((UIElement)e.OriginalSource, this.Width - 79);
-                        Selected.ReleaseMouseCapture();
-                        captureMouse = false;
-                        Selected = null;
-                    }
-
-                    else if (Canvas.GetLeft((UIElement)e.OriginalSource) <= 0)
-                    {
-                        Canvas.SetLeft((UIElement)e.OriginalSource, this.Width - 79);
-                        Selected.ReleaseMouseCapture();
-                        captureMouse = false;
-                        Selected = null;
-                    }
-                }
-                else if (e.OriginalSource == line)
-                {
-                    Canvas.SetLeft(line, e.GetPosition(this.forAdd).X - diffPosition.X);
-                    Canvas.SetTop(line, e.GetPosition(this.forAdd).Y - diffPosition.Y);
-                }
-            }
-            
-
-            ///for line probably
-
-
-
-        }
+        //    /
+        //}
     }
 }
 

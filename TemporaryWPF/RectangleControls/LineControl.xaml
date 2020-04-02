@@ -4,10 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TemporaryWPF.RectangleControls"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid x:Name="mline">
-        <Button Content="Add stuff"></Button>
-    </Grid>
+             mc:Ignorable="d">
+    
+    <Canvas x:Name="lcgrid" MouseLeftButtonDown="Lcgrid_MouseLeftButtonDown" 
+          MouseLeftButtonUp="Lcgrid_MouseLeftButtonUp" MouseMove="Lcgrid_MouseMove" >
+        
+        <Rectangle Fill="SandyBrown" Height="{Binding ElementName=lcgrid, Path=ActualHeight}"
+               Width="{Binding ElementName=lcgrid, Path=ActualWidth}"></Rectangle>
+        <Ellipse x:Name="lcellipse" Fill="Black"
+                 Canvas.Left="10" Canvas.Top="5"
+                Width="10" Height="10"></Ellipse>
+    </Canvas>
 
 </UserControl>
