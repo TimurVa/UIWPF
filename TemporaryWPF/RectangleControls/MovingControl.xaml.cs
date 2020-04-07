@@ -33,6 +33,8 @@ namespace TemporaryWPF.RectangleControls
         public Rectangle rectangle;
         public ObservableCollection<LineControl> _lineControl;
 
+      //  public static event EventHandler ValueChangedEvent;
+
 
         public MovingControl()
         {
@@ -55,7 +57,43 @@ namespace TemporaryWPF.RectangleControls
             _lineControl = new ObservableCollection<LineControl>();
             _lineControl.CollectionChanged += _lineControl_CollectionChanged;
         }
-       
+
+        //private Point _StartPoint;
+        //private Point _EndPoint;
+
+        //public Point StartPoint
+        //{
+        //    get
+        //    {
+        //        return _StartPoint;
+        //    }
+        //    set
+        //    {
+        //        _StartPoint = value;
+        //        // _StartPoint.Connections.Add(this);
+        //        OnValueChanged();
+        //    }
+        //}
+
+        //public Point EndPoint
+        //{
+        //    get
+        //    {
+        //        return _EndPoint;
+        //    }
+        //    set
+        //    {
+        //        _EndPoint = value;
+        //        // _EndPoint.Connections.Add(this);
+        //        OnValueChanged();
+        //    }
+        //}
+
+        //protected virtual void OnValueChanged()
+        //{
+        //    ValueChangedEvent?.Invoke(this, EventArgs.Empty); 
+        //}
+
 
         private void _lineControl_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -113,6 +151,9 @@ namespace TemporaryWPF.RectangleControls
             var ar = LogicalTreeHelper.GetParent(this);
             Point point = Mouse.GetPosition((IInputElement)ar);
 
+                var o = this._lineControl.Where(x => x.lcgrid == e.OriginalSource)
+                    .FirstOrDefault();
+
                 double OffsetX = point.X - PrevPos.X;
                 double OffsetY = point.Y - PrevPos.Y;
 
@@ -124,6 +165,9 @@ namespace TemporaryWPF.RectangleControls
                 Canvas.SetLeft(this, NewX);
                 Canvas.SetTop(this, NewY);
 
+
+              //  EndPoint = Mouse.GetPosition(o.line);
+
                 Canvas.SetLeft(this.BaseRectangleModel.shape, NewX);
                 Canvas.SetTop(this.BaseRectangleModel.shape, NewY);
 
@@ -133,9 +177,6 @@ namespace TemporaryWPF.RectangleControls
         //delete
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-                forAdd.Children.Remove(line);
-                forAdd.Children.Remove(ellipse);
-                forAdd.Children.Remove(rectangle);
                 clear.Children.Remove(this.BaseRectangleModel.shape);
                 OveralldbClass.db.Remove(this.BaseRectangleModel.model);
                 OveralldbClass.db.SaveChanges();

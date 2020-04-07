@@ -10,7 +10,8 @@
         <StackPanel>
             <Button Width="100" Height="50" VerticalAlignment="Bottom" HorizontalAlignment="Left" Content="Add Rectangle" Margin="5" Click="NewRectangle"></Button>
         </StackPanel>
-        <Canvas x:Name="area"/>
+        <Canvas x:Name="area">
+        </Canvas>
     </Grid>
 </Window>
     

@@ -8,12 +8,17 @@
     
     <Canvas x:Name="lcgrid" MouseLeftButtonDown="Lcgrid_MouseLeftButtonDown" 
           MouseLeftButtonUp="Lcgrid_MouseLeftButtonUp" MouseMove="Lcgrid_MouseMove" >
+        <Canvas.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Delete" Click="MenuItem_Click"></MenuItem>
+            </ContextMenu>
+        </Canvas.ContextMenu>
         
         <Rectangle Fill="SandyBrown" Height="{Binding ElementName=lcgrid, Path=ActualHeight}"
                Width="{Binding ElementName=lcgrid, Path=ActualWidth}"></Rectangle>
         <Ellipse x:Name="lcellipse" Fill="Black"
                  Canvas.Left="10" Canvas.Top="5"
-                Width="10" Height="10"></Ellipse>
+                Width="10" Height="10" AllowDrop="True"></Ellipse>
     </Canvas>
 
 </UserControl>

@@ -153,6 +153,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Connector.cs" />
     <Compile Include="Models\BaseRectangleController.cs" />
     <Compile Include="Models\BaseRectangleModel.cs" />
     <Compile Include="RectangleControls\LineControl.xaml.cs">
